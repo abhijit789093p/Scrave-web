@@ -1,0 +1,54 @@
+  console.log
+    [dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+    [2026-03-28T08:03:30.028Z] INFO: Database migration complete
+
+      at Object.log [as info] (src/utils/logger.js:15:30)
+
+FAIL tests/integration.test.js
+  Integration Tests: API flow
+    √ GET /api/v1/health should verify API connects and sees database (58 ms)
+    Auth and Usage workflow
+      √ should register a new user successfully (235 ms)
+      √ should login and return user details with api key prefixes (87 ms)
+      √ GET /api/v1/usage should return a valid summary using an API key header (18 ms)
+      × GET /api/v1/usage missing API key should be rejected (18 ms)
+    Feature Endpoints (Screenshot and PDF)
+      √ POST /api/v1/screenshot should capture a screenshot (8 ms)
+      √ POST /api/v1/pdf should generate a PDF (6 ms)
+      √ POST /api/v1/screenshot should validate input payload (17 ms)
+
+  ● Integration Tests: API flow › Auth and Usage workflow › GET /api/v1/usage missing API key should be rejected
+
+    expect(received).toSatisfyApiSpec() // Matches 'received' to a response defined in your API spec, then validates 'received' against it
+
+    expected received to satisfy the '401' response defined for endpoint 'GET /api/v1/usage' in your API spec
+
+    received did not satisfy it because: response must be null
+
+    received contained: {
+      body: {
+        error: { message: 'Missing x-api-key header', code: 'UNAUTHORIZED' }
+      }
+    }
+
+    The '401' response defined for endpoint 'GET /api/v1/usage' in API spec: { '401': { description: 'Unauthorized' } }
+
+    [0m [90m 92 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m'/api/v1/usage'[39m)[33m;[39m
+     [90m 93 |[39m       expect(response[33m.[39mstatus)[33m.[39mtoBe([35m401[39m)[33m;[39m 
+    [31m[1m>[22m[39m[90m 94 |[39m       expect(response)[33m.[39mtoSatisfyApiSpec()[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 95 |[39m     })[33m;[39m
+     [90m 96 |[39m   })[33m;[39m
+     [90m 97 |[39m[0m
+
+      at Object.toSatisfyApiSpec (tests/integration.test.js:94:24)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 7 passed, 8 total
+Snapshots:   0 total
+Time:        2.349 s, estimated 4 s
+Ran all test suites matching tests/integration.test.js.

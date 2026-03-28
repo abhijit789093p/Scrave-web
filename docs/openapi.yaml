@@ -1,0 +1,327 @@
+openapi: 3.0.3
+info:
+  title: Scrave API
+  description: One API call. Pixel-perfect output. Zero infrastructure. Screenshot (PNG/JPEG) and PDF generation from any public URL using headless Chromium.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://api.scrave.example.com
+    description: Production server
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+  
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            code:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+    ValidationError:
+      $ref: '#/components/schemas/ErrorResponse'
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  service:
+                    type: string
+                  version:
+                    type: string
+                  db:
+                    type: boolean
+                  uptime:
+                    type: number
+
+  /auth/register:
+    post:
+      summary: Register a new account
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  apiKey:
+                    type: string
+                  email:
+                    type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /auth/login:
+    post:
+      summary: Login to account
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 1
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    type: object
+                  keys:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /api/v1/usage:
+    get:
+      summary: Get API usage summary
+      operationId: getUsage
+      responses:
+        '200':
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    type: string
+                  limit:
+                    type: integer
+                  remaining:
+                    type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/screenshot:
+    post:
+      summary: Capture a screenshot
+      operationId: captureScreenshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                width:
+                  type: integer
+                  minimum: 320
+                  maximum: 3840
+                  default: 1280
+                height:
+                  type: integer
+                  minimum: 240
+                  maximum: 2160
+                  default: 720
+                fullPage:
+                  type: boolean
+                  default: false
+                format:
+                  type: string
+                  enum: [png, jpeg]
+                  default: png
+                quality:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                delay:
+                  type: integer
+                  minimum: 0
+                  maximum: 10000
+                  default: 0
+                injectCss:
+                  type: string
+                  maxLength: 10000
+                  description: Custom CSS to inject before capture
+                waitForSelector:
+                  type: string
+                  maxLength: 255
+                  description: CSS selector to wait for before capture
+                clickSelector:
+                  type: string
+                  maxLength: 255
+                  description: CSS selector to click before capture (e.g. cookie banner dismiss)
+      responses:
+        '200':
+          description: Screenshot image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/pdf:
+    post:
+      summary: Generate a PDF
+      operationId: generatePdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                format:
+                  type: string
+                  enum: [A4, Letter, Legal, Tabloid]
+                  default: A4
+                landscape:
+                  type: boolean
+                  default: false
+                printBackground:
+                  type: boolean
+                  default: true
+                margin:
+                  type: object
+                  properties:
+                    top:
+                      type: string
+                      default: '1cm'
+                    right:
+                      type: string
+                      default: '1cm'
+                    bottom:
+                      type: string
+                      default: '1cm'
+                    left:
+                      type: string
+                      default: '1cm'
+                injectCss:
+                  type: string
+                  maxLength: 10000
+                  description: Custom CSS to inject before capture
+                waitForSelector:
+                  type: string
+                  maxLength: 255
+                  description: CSS selector to wait for before capture
+                clickSelector:
+                  type: string
+                  maxLength: 255
+                  description: CSS selector to click before capture (e.g. cookie banner dismiss)
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

@@ -1,0 +1,123 @@
+{
+  "info": {
+    "name": "SnapForge API v1",
+    "description": "API collection for SnapForge's screenshot and PDF generation engine.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "health"]
+        }
+      }
+    },
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"securepassword123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"securepassword123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Take Screenshot",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-api-key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"url\": \"https://example.com\",\n    \"fullPage\": true,\n    \"format\": \"png\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/screenshot",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "screenshot"]
+        }
+      }
+    },
+    {
+      "name": "Generate PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-api-key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"url\": \"https://example.com\",\n    \"format\": \"A4\",\n    \"landscape\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/pdf",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "pdf"]
+        }
+      }
+    },
+    {
+      "name": "Get Usage",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "x-api-key", "value": "{{api_key}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/usage",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "usage"]
+        }
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": { "type": "text/javascript", "exec": [""] }
+    },
+    {
+      "listen": "test",
+      "script": { "type": "text/javascript", "exec": [""] }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "api_key", "value": "sf_live_YOUR_API_KEY", "type": "string" }
+  ]
+}

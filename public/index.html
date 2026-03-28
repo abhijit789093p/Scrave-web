@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scrave — Screenshot & PDF API</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='36' viewBox='0 0 34 38'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='34' y2='38' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%237c3aed'/%3E%3Cstop offset='50%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M15.3 1.2a3.4 3.4 0 0 1 3.4 0l11.8 6.8a3.4 3.4 0 0 1 1.7 2.9v13.6a3.4 3.4 0 0 1-1.7 3L18.7 34.3a3.4 3.4 0 0 1-3.4 0L3.5 27.5a3.4 3.4 0 0 1-1.7-3V10.9a3.4 3.4 0 0 1 1.7-2.9Z' fill='url(%23g)'/%3E%3Cpath d='M21.5 13.5c0-1.8-1.5-3-3.8-3-2.6 0-4.2 1.3-4.2 3.2 0 1.5.9 2.4 3.2 3l1.6.4c1.3.3 1.8.7 1.8 1.4 0 .9-.9 1.5-2.3 1.5-1.5 0-2.5-.6-2.7-1.7h-2.6c.2 2.2 1.9 3.5 5.2 3.5 2.8 0 4.5-1.3 4.5-3.4 0-1.5-1-2.4-3.2-3l-1.7-.4c-1.2-.3-1.7-.7-1.7-1.4 0-.8.8-1.4 2.1-1.4 1.3 0 2.1.6 2.3 1.6h2.5Z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Cabinet+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Living gradient mesh background -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora-layer aurora-1"></div>
+    <div class="aurora-layer aurora-2"></div>
+    <div class="aurora-layer aurora-3"></div>
+    <div class="aurora-layer aurora-4"></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="logo">
+        <img src="/logo.png" alt="Scrave" class="logo-img" />
+        Scrave
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#docs">Docs</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#" id="nav-login-btn" onclick="openModal('login'); return false;">Login</a>
+        <button class="btn btn-nav" onclick="openModal('register')">Get API Key</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text" data-reveal>
+        <div class="badge"><span class="badge-dot"></span> Developer-first API</div>
+        <h1>Pixel-perfect<br><span class="shimmer">screenshots & PDFs</span><br>from any URL</h1>
+        <p class="hero-sub">One API call. Headless Chromium rendering. Built for developers who need reliable, fast, and scalable web captures.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="openModal('register')">Get API Key <span class="arrow">&rarr;</span></button>
+          <a href="#docs" class="btn btn-glass">View API Docs</a>
+        </div>
+        <p class="hero-note">100 free requests/month &middot; No credit card required</p>
+      </div>
+      <div class="hero-visual" data-reveal data-delay="200">
+        <div class="code-window">
+          <div class="code-chrome">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="code-filename">request.sh</span>
+          </div>
+<pre class="code-body"><code><span class="tok-cmd">curl</span> <span class="tok-flag">-X POST</span> https://api.scrave.dev/api/v1/screenshot \
+  <span class="tok-flag">-H</span> <span class="tok-str">"x-api-key: sf_live_your_key"</span> \
+  <span class="tok-flag">-H</span> <span class="tok-str">"Content-Type: application/json"</span> \
+  <span class="tok-flag">-d</span> <span class="tok-str">'{
+    "url": "https://example.com",
+    "width": 1280,
+    "height": 720,
+    "format": "png"
+  }'</span> \
+  <span class="tok-flag">--output</span> screenshot.png</code></pre>
+        </div>
+        <!-- Floating decorative orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats (live from API) -->
+  <section class="stats">
+    <div class="container stats-grid">
+      <div class="stat" data-reveal>
+        <span class="stat-num" id="stat-avg-ms" data-target="0">0</span><span class="stat-unit">ms</span>
+        <span class="stat-label">Avg response</span>
+      </div>
+      <div class="stat" data-reveal data-delay="80">
+        <span class="stat-num" id="stat-uptime" data-target="0">0</span><span class="stat-unit">s</span>
+        <span class="stat-label">Uptime</span>
+      </div>
+      <div class="stat" data-reveal data-delay="160">
+        <span class="stat-num" id="stat-captures" data-target="0">0</span><span class="stat-unit"></span>
+        <span class="stat-label">Captures served</span>
+      </div>
+      <div class="stat" data-reveal data-delay="240">
+        <span class="stat-num" id="stat-users" data-target="0">0</span><span class="stat-unit"></span>
+        <span class="stat-label">Registered users</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works — Animated Terminal Demo -->
+  <section id="features" class="demo-section">
+    <div class="container">
+      <h2 data-reveal>See how it works</h2>
+      <p class="section-sub" data-reveal>Register, get your key, take a screenshot &mdash; in 3 steps.</p>
+
+      <div class="demo-layout" data-reveal>
+        <!-- Steps sidebar -->
+        <div class="demo-steps">
+          <div class="demo-step active" data-step="0">
+            <div class="step-num">1</div>
+            <div class="step-info">
+              <h4>Register</h4>
+              <p>Create an account with email &amp; password</p>
+            </div>
+          </div>
+          <div class="demo-step" data-step="1">
+            <div class="step-num">2</div>
+            <div class="step-info">
+              <h4>Get API Key</h4>
+              <p>Receive your unique sf_live_ key instantly</p>
+            </div>
+          </div>
+          <div class="demo-step" data-step="2">
+            <div class="step-num">3</div>
+            <div class="step-info">
+              <h4>Capture</h4>
+              <p>Send a URL, get back a screenshot or PDF</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animated terminal -->
+        <div class="demo-terminal">
+          <div class="code-chrome">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="code-filename">terminal</span>
+          </div>
+          <div class="terminal-body" id="terminal-body">
+            <div class="term-line" id="term-cursor"><span class="term-prompt">$</span> <span class="term-typed" id="term-typed"></span><span class="cursor">|</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- API Docs — Tabbed, compact -->
+  <section id="docs" class="docs">
+    <div class="container">
+      <h2 data-reveal>API Reference</h2>
+      <p class="section-sub" data-reveal>Two core endpoints. Just add your API key.</p>
+
+      <div class="docs-tabs" data-reveal>
+        <div class="tab-bar">
+          <button class="tab active" data-tab="screenshot"><span class="method post">POST</span> /screenshot</button>
+          <button class="tab" data-tab="pdf"><span class="method post">POST</span> /pdf</button>
+          <button class="tab" data-tab="auth"><span class="method post">POST</span> /register</button>
+          <button class="tab" data-tab="usage"><span class="method get">GET</span> /usage</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-screenshot">
+          <div class="panel-grid">
+            <div class="panel-params">
+              <h4>Parameters</h4>
+              <div class="param"><code>url</code> <span class="param-tag required">required</span><br/><span class="param-desc">Public URL to capture</span></div>
+              <div class="param"><code>width</code> <span class="param-default">1280</span><br/><span class="param-desc">Viewport width (320-3840)</span></div>
+              <div class="param"><code>height</code> <span class="param-default">720</span><br/><span class="param-desc">Viewport height (240-2160)</span></div>
+              <div class="param"><code>fullPage</code> <span class="param-default">false</span><br/><span class="param-desc">Capture full scrollable page</span></div>
+              <div class="param"><code>format</code> <span class="param-default">"png"</span><br/><span class="param-desc">"png" or "jpeg"</span></div>
+              <div class="param"><code>quality</code> <span class="param-default">—</span><br/><span class="param-desc">JPEG quality (1-100)</span></div>
+              <div class="param"><code>delay</code> <span class="param-default">0</span><br/><span class="param-desc">Wait ms after load (0-10000)</span></div>
+            </div>
+            <div class="panel-example">
+              <h4>Example</h4>
+              <div class="code-block">
+<pre><code>curl -X POST /api/v1/screenshot \
+  -H "x-api-key: YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://github.com",
+    "width": 1440,
+    "fullPage": true
+  }' --output github.png</code></pre>
+              </div>
+              <p class="panel-note">Returns image/png or image/jpeg binary</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-pdf">
+          <div class="panel-grid">
+            <div class="panel-params">
+              <h4>Parameters</h4>
+              <div class="param"><code>url</code> <span class="param-tag required">required</span><br/><span class="param-desc">Public URL to render</span></div>
+              <div class="param"><code>format</code> <span class="param-default">"A4"</span><br/><span class="param-desc">A4, Letter, Legal, Tabloid</span></div>
+              <div class="param"><code>landscape</code> <span class="param-default">false</span><br/><span class="param-desc">Landscape orientation</span></div>
+              <div class="param"><code>printBackground</code> <span class="param-default">true</span><br/><span class="param-desc">Include CSS backgrounds</span></div>
+              <div class="param"><code>margin</code> <span class="param-default">1cm</span><br/><span class="param-desc">{ top, right, bottom, left }</span></div>
+            </div>
+            <div class="panel-example">
+              <h4>Example</h4>
+              <div class="code-block">
+<pre><code>curl -X POST /api/v1/pdf \
+  -H "x-api-key: YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "format": "Letter",
+    "landscape": true
+  }' --output page.pdf</code></pre>
+              </div>
+              <p class="panel-note">Returns application/pdf binary</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-auth">
+          <div class="panel-grid">
+            <div class="panel-params">
+              <h4>Parameters</h4>
+              <div class="param"><code>email</code> <span class="param-tag required">required</span><br/><span class="param-desc">Valid email address</span></div>
+              <div class="param"><code>password</code> <span class="param-tag required">required</span><br/><span class="param-desc">Min 8 characters</span></div>
+            </div>
+            <div class="panel-example">
+              <h4>Example</h4>
+              <div class="code-block">
+<pre><code>curl -X POST /auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "you@example.com",
+    "password": "securepass123"
+  }'
+
+# { "apiKey": "sf_live_...",
+#   "email": "you@example.com" }</code></pre>
+              </div>
+              <p class="panel-note">API key shown once — save it immediately</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-usage">
+          <div class="panel-grid">
+            <div class="panel-params">
+              <h4>Response</h4>
+              <div class="param"><code>tier</code><br/><span class="param-desc">free, pro, or business</span></div>
+              <div class="param"><code>used</code><br/><span class="param-desc">Requests used this month</span></div>
+              <div class="param"><code>limit</code><br/><span class="param-desc">Monthly request limit</span></div>
+              <div class="param"><code>remaining</code><br/><span class="param-desc">Requests left</span></div>
+              <div class="param"><code>resetDate</code><br/><span class="param-desc">1st of next month</span></div>
+            </div>
+            <div class="panel-example">
+              <h4>Example</h4>
+              <div class="code-block">
+<pre><code>curl /api/v1/usage \
+  -H "x-api-key: YOUR_KEY"
+
+# { "tier": "free",
+#   "used": 12,
+#   "limit": 100,
+#   "remaining": 88,
+#   "resetDate": "2026-04-01" }</code></pre>
+              </div>
+              <p class="panel-note">Requires x-api-key header</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="pricing">
+    <div class="container">
+      <h2 data-reveal>Simple, transparent pricing</h2>
+      <p class="section-sub" data-reveal>Start free. Scale when you need to.</p>
+      <div class="pricing-grid">
+        <div class="price-card" data-reveal>
+          <h3>Free</h3>
+          <div class="price">$0<span>/mo</span></div>
+          <ul>
+            <li>100 requests/month</li>
+            <li>Screenshot + PDF APIs</li>
+            <li>1 API key</li>
+            <li>Community support</li>
+          </ul>
+          <button class="btn btn-glass btn-block" onclick="openModal('register')">Get Started</button>
+        </div>
+        <div class="price-card featured" data-reveal data-delay="100">
+          <div class="popular-tag">Most Popular</div>
+          <h3>Pro</h3>
+          <div class="price">$9<span>/mo</span></div>
+          <ul>
+            <li>5,000 requests/month</li>
+            <li>Screenshot + PDF APIs</li>
+            <li>Multiple API keys</li>
+            <li>Priority support</li>
+            <li>Higher concurrency</li>
+          </ul>
+          <button class="btn btn-primary btn-block" onclick="openModal('register')">Upgrade to Pro</button>
+        </div>
+        <div class="price-card" data-reveal data-delay="200">
+          <h3>Business</h3>
+          <div class="price">$39<span>/mo</span></div>
+          <ul>
+            <li>50,000 requests/month</li>
+            <li>Screenshot + PDF APIs</li>
+            <li>Unlimited API keys</li>
+            <li>Dedicated support</li>
+            <li>Custom concurrency</li>
+            <li>SLA guarantee</li>
+          </ul>
+          <button class="btn btn-glass btn-block" onclick="openModal('register')">Get Started</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Register Modal ══ -->
+  <div class="modal-overlay" id="modal-register">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModals()">&times;</button>
+      <h2>Create your account</h2>
+      <p class="modal-sub">Get your API key and start capturing instantly.</p>
+
+      <form id="register-form" autocomplete="off">
+        <div class="form-group">
+          <label for="reg-name">Full Name <span class="required">*</span></label>
+          <input type="text" id="reg-name" placeholder="John Doe" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email <span class="required">*</span></label>
+          <input type="email" id="reg-email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password <span class="required">*</span></label>
+          <input type="password" id="reg-password" placeholder="Min 8 characters" minlength="8" required />
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="reg-agree" required />
+          <span>I agree to the <a href="#" onclick="openModal('privacy'); return false;" class="link-inline">Privacy Policy</a></span>
+        </label>
+        <button type="submit" class="btn btn-primary btn-block btn-submit" id="reg-submit-btn" disabled>
+          <span id="reg-btn-text">Register</span>
+          <span id="reg-spinner" class="spinner" hidden></span>
+        </button>
+        <p id="reg-error" class="form-error" hidden></p>
+      </form>
+
+      <!-- Success state -->
+      <div id="reg-success" class="reg-success" hidden>
+        <div class="success-icon">&#10003;</div>
+        <h3>Welcome aboard!</h3>
+        <p class="success-note">Your API key is below. Save it now &mdash; it won't be shown again.</p>
+        <div class="api-key-box">
+          <code id="api-key-display"></code>
+          <button type="button" class="btn-copy" id="copy-key-btn" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+        <p id="copy-confirm" class="copy-confirm" hidden>Copied!</p>
+        <a href="/dashboard.html" class="btn btn-primary btn-block" style="margin-top:20px;">Go to Dashboard &rarr;</a>
+      </div>
+
+      <p class="modal-switch">Already have an account? <a href="#" onclick="openModal('login'); return false;">Login</a></p>
+    </div>
+  </div>
+
+  <!-- ══ Login Modal ══ -->
+  <div class="modal-overlay" id="modal-login">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModals()">&times;</button>
+      <h2>Welcome back</h2>
+      <p class="modal-sub">Login to access your dashboard and API key.</p>
+
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="login-email">Email <span class="required">*</span></label>
+          <input type="email" id="login-email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password <span class="required">*</span></label>
+          <input type="password" id="login-password" placeholder="Your password" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-submit" id="login-submit-btn" disabled>
+          <span id="login-btn-text">Login</span>
+          <span id="login-spinner" class="spinner" hidden></span>
+        </button>
+        <p id="login-error" class="form-error" hidden></p>
+      </form>
+
+      <p class="modal-switch">Don't have an account? <a href="#" onclick="openModal('register'); return false;">Register</a></p>
+    </div>
+  </div>
+
+  <!-- ══ Privacy Policy Modal ══ -->
+  <div class="modal-overlay" id="modal-privacy">
+    <div class="modal modal-privacy">
+      <button class="modal-close" onclick="closeModals()">&times;</button>
+      <h2>Privacy Policy</h2>
+      <div class="privacy-content">
+        <h3>Data We Collect</h3>
+        <p>When you register, we collect your name, email address, and a hashed version of your password. We never store your password in plain text.</p>
+
+        <h3>API Keys</h3>
+        <p>Your API key is shown once at registration. We store only a SHA-256 hash of it. We cannot recover or view your key after creation.</p>
+
+        <h3>Usage Data</h3>
+        <p>We log API call metadata (endpoint, status code, response time, timestamp) to provide usage tracking and enforce monthly quotas. We do not store the content of your screenshots or PDFs.</p>
+
+        <h3>Payment Information</h3>
+        <p>All payment processing is handled by Stripe. We never see, store, or have access to your credit card details. Stripe is PCI DSS Level 1 certified.</p>
+
+        <h3>Data Security</h3>
+        <p>Passwords are hashed with bcrypt (10 salt rounds). API keys are hashed with SHA-256. All data is transmitted over HTTPS in production. Security headers are enforced via Helmet.</p>
+
+        <h3>No Sharing</h3>
+        <p>We do not sell, share, or distribute your personal data to any third party. Your data is used solely to operate the Scrave service.</p>
+
+        <h3>Data Deletion</h3>
+        <p>You may request deletion of your account and all associated data by contacting us. Upon deletion, all user data, API keys, and usage logs will be permanently removed.</p>
+
+        <h3>Contact</h3>
+        <p>For any privacy-related questions, reach out via our Discord community or Twitter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ About Modal ══ -->
+  <div class="modal-overlay" id="modal-about">
+    <div class="modal modal-about">
+      <button class="modal-close" onclick="closeModals()">&times;</button>
+      <h2>About Scrave</h2>
+
+      <div class="about-section">
+        <h3>What is Scrave?</h3>
+        <p>Scrave is a developer-first API that converts any public webpage into pixel-perfect screenshots (PNG/JPEG) or PDF documents. One API call, headless Chromium rendering, zero infrastructure to manage.</p>
+      </div>
+
+      <div class="about-section">
+        <h3>Why does it exist?</h3>
+        <p>Developers need web captures for reporting, social cards, invoices, visual testing, and archiving. But self-hosting headless browsers is fragile and expensive, and enterprise APIs charge $100+/month.</p>
+        <p>Scrave offers a simple, affordable middle ground — a generous free tier, transparent pricing, and an API you can set up in 30 seconds from the terminal.</p>
+      </div>
+
+      <div class="about-section">
+        <h3>How it works</h3>
+        <div class="about-steps">
+          <div class="about-step">
+            <span class="about-step-num">1</span>
+            <span>Register and get your <code>sf_live_</code> API key</span>
+          </div>
+          <div class="about-step">
+            <span class="about-step-num">2</span>
+            <span>Send a POST request with a URL to <code>/api/v1/screenshot</code> or <code>/api/v1/pdf</code></span>
+          </div>
+          <div class="about-step">
+            <span class="about-step-num">3</span>
+            <span>Get back the rendered image or PDF — that's it</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h3>Built with</h3>
+        <div class="about-tags">
+          <span class="about-tag">Node.js</span>
+          <span class="about-tag">Express 5</span>
+          <span class="about-tag">Playwright</span>
+          <span class="about-tag">SQLite</span>
+          <span class="about-tag">Stripe</span>
+          <span class="about-tag">Zod</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="/logo.png" alt="Scrave" class="logo-img logo-img-sm" />
+        Scrave
+      </div>
+      <div class="footer-links">
+        <a href="#" onclick="openModal('about'); return false;">About</a>
+        <a href="#docs">API Docs</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://x.com/scrave" target="_blank" rel="noopener" title="Twitter / X" class="social-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://discord.gg/scrave" target="_blank" rel="noopener" title="Discord" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+        </a>
+      </div>
+      <span class="footer-copy">&copy; 2026 Scrave</span>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

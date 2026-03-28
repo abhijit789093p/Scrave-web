@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  scrave-api:
+    build: .
+    container_name: scrave-production
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      # Provide secret variables here or in a .env file locally
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: scrave-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

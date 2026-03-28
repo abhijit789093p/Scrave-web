@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Scrave</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='36' viewBox='0 0 34 38'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='34' y2='38' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%237c3aed'/%3E%3Cstop offset='50%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M15.3 1.2a3.4 3.4 0 0 1 3.4 0l11.8 6.8a3.4 3.4 0 0 1 1.7 2.9v13.6a3.4 3.4 0 0 1-1.7 3L18.7 34.3a3.4 3.4 0 0 1-3.4 0L3.5 27.5a3.4 3.4 0 0 1-1.7-3V10.9a3.4 3.4 0 0 1 1.7-2.9Z' fill='url(%23g)'/%3E%3Cpath d='M21.5 13.5c0-1.8-1.5-3-3.8-3-2.6 0-4.2 1.3-4.2 3.2 0 1.5.9 2.4 3.2 3l1.6.4c1.3.3 1.8.7 1.8 1.4 0 .9-.9 1.5-2.3 1.5-1.5 0-2.5-.6-2.7-1.7h-2.6c.2 2.2 1.9 3.5 5.2 3.5 2.8 0 4.5-1.3 4.5-3.4 0-1.5-1-2.4-3.2-3l-1.7-.4c-1.2-.3-1.7-.7-1.7-1.4 0-.8.8-1.4 2.1-1.4 1.3 0 2.1.6 2.3 1.6h2.5Z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Cabinet+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora-layer aurora-1"></div>
+    <div class="aurora-layer aurora-2"></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar scrolled">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <img src="/logo.png" alt="Scrave" class="logo-img" />
+        Scrave
+      </a>
+      <div class="nav-links">
+        <span id="nav-email" class="nav-email"></span>
+        <button class="btn btn-nav" id="logout-btn">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <main class="dash-main">
+    <div class="container">
+
+      <!-- Loading state -->
+      <div id="dash-loading" class="dash-loading">
+        <div class="spinner" style="width:24px;height:24px;border-width:3px;"></div>
+        <span>Loading dashboard...</span>
+      </div>
+
+      <!-- Dashboard content (hidden until loaded) -->
+      <div id="dash-content" hidden>
+
+        <!-- Welcome header -->
+        <div class="dash-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="dash-sub">Welcome back, <span id="dash-name"></span></p>
+          </div>
+          <div class="tier-badge" id="dash-tier">Free</div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="dash-stats">
+          <div class="dash-stat-card">
+            <span class="dash-stat-label">Requests Used</span>
+            <span class="dash-stat-value" id="dash-used">0</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-label">Monthly Limit</span>
+            <span class="dash-stat-value" id="dash-limit">100</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-label">Remaining</span>
+            <span class="dash-stat-value" id="dash-remaining">100</span>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-label">Resets On</span>
+            <span class="dash-stat-value" id="dash-reset">—</span>
+          </div>
+        </div>
+
+        <!-- Usage bar -->
+        <div class="usage-bar-wrap">
+          <div class="usage-bar-bg">
+            <div class="usage-bar-fill" id="usage-bar" style="width:0%"></div>
+          </div>
+          <span class="usage-bar-text" id="usage-bar-text">0%</span>
+        </div>
+
+        <!-- API Key section -->
+        <div class="dash-section">
+          <h2>API Key</h2>
+          <p class="dash-section-sub">Your active key prefix is shown below. If you lost your key, regenerate a new one.</p>
+
+          <div class="key-row">
+            <div class="key-display">
+              <code id="dash-key-prefix">sf_live_••••••••</code>
+              <span class="key-status" id="dash-key-status">Active</span>
+            </div>
+            <button class="btn btn-glass" id="regen-btn">
+              <span id="regen-btn-text">Regenerate Key</span>
+              <span id="regen-spinner" class="spinner" hidden></span>
+            </button>
+          </div>
+
+          <!-- New key display (hidden until regenerated) -->
+          <div id="regen-success" class="regen-success" hidden>
+            <div class="api-key-box">
+              <code id="regen-key-display"></code>
+              <button type="button" class="btn-copy" id="regen-copy-btn" title="Copy">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+            </div>
+            <p class="regen-warn">Save this key now — it won't be shown again. Your old key has been deactivated.</p>
+            <p id="regen-copy-confirm" class="copy-confirm" hidden>Copied!</p>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="dash-section">
+          <h2>Recent Activity</h2>
+          <p class="dash-section-sub">Your last 20 API calls this month.</p>
+
+          <div class="table-wrap">
+            <table class="dash-table" id="history-table">
+              <thead>
+                <tr><th>Endpoint</th><th>Status</th><th>Response Time</th><th>Date</th></tr>
+              </thead>
+              <tbody id="history-body">
+                <tr><td colspan="4" class="table-empty">No API calls yet. Make your first request!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

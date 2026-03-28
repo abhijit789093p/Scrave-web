@@ -1,0 +1,150 @@
+/* ── Dashboard Page ── */
+
+.dash-main { padding: 110px 0 60px; min-height: 100vh; }
+.nav-email { font-size: 0.85rem; color: var(--text-mid); }
+
+.dash-loading {
+  display: flex; align-items: center; gap: 12px;
+  justify-content: center; padding: 120px 0;
+  font-size: 0.95rem; color: var(--text-mid);
+}
+
+/* Header */
+.dash-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 36px;
+}
+.dash-header h1 {
+  font-family: var(--ff-display);
+  font-size: 2rem; font-weight: 800; text-align: left;
+  margin-bottom: 4px;
+}
+.dash-sub { font-size: 0.95rem; color: var(--text-mid); }
+.tier-badge {
+  padding: 8px 20px; border-radius: var(--r-sm);
+  font-family: var(--ff-display); font-weight: 700;
+  font-size: 0.85rem; text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, var(--hue-purple), var(--hue-cyan));
+  color: #fff;
+}
+
+/* Stats row */
+.dash-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 20px;
+}
+.dash-stat-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg); padding: 24px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+.dash-stat-label {
+  display: block; font-size: 0.72rem; font-weight: 600;
+  color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 8px;
+}
+.dash-stat-value {
+  font-family: var(--ff-display);
+  font-size: 1.8rem; font-weight: 800; color: #fff;
+}
+
+/* Usage bar */
+.usage-bar-wrap {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 40px;
+}
+.usage-bar-bg {
+  flex: 1; height: 10px; border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.usage-bar-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(90deg, var(--hue-purple), var(--hue-cyan));
+  transition: width 1s var(--ease);
+}
+.usage-bar-text {
+  font-family: var(--ff-mono); font-size: 0.82rem;
+  color: var(--text-mid); min-width: 40px;
+}
+
+/* Sections */
+.dash-section {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-xl); padding: 32px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+}
+.dash-section h2 {
+  font-family: var(--ff-display);
+  font-size: 1.3rem; font-weight: 700;
+  text-align: left; margin-bottom: 6px;
+}
+.dash-section-sub {
+  font-size: 0.88rem; color: var(--text-dim);
+  margin-bottom: 24px; text-align: left;
+}
+
+/* Key row */
+.key-row {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.key-display {
+  flex: 1; display: flex; align-items: center; gap: 12px;
+  background: rgba(4, 4, 12, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md); padding: 14px 18px;
+}
+.key-display code {
+  font-size: 0.9rem; color: var(--text-mid);
+}
+.key-status {
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 3px 10px; border-radius: 6px;
+  background: rgba(20, 184, 166, 0.12); color: var(--hue-teal);
+  margin-left: auto;
+}
+
+/* Regen success */
+.regen-success { margin-top: 16px; }
+.regen-warn {
+  font-size: 0.82rem; color: var(--hue-magenta);
+  margin-top: 10px; font-weight: 500;
+}
+
+/* History table */
+.table-wrap { overflow-x: auto; }
+.dash-table {
+  width: 100%; border-collapse: collapse; font-size: 0.85rem;
+}
+.dash-table th {
+  text-align: left; padding: 12px 16px;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.dash-table td {
+  padding: 11px 16px; color: var(--text-mid);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.dash-table .table-empty {
+  text-align: center; color: var(--text-dim);
+  padding: 32px 16px;
+}
+.status-ok { color: var(--hue-teal); font-weight: 600; }
+.status-err { color: var(--hue-magenta); font-weight: 600; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dash-stats { grid-template-columns: repeat(2, 1fr); }
+  .dash-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .key-row { flex-direction: column; }
+  .key-display { width: 100%; }
+}
