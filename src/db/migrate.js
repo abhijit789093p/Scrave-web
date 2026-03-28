@@ -1,20 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const { getDb } = require('./connection');
+const { getPool } = require('./connection');
 const logger = require('../utils/logger');
 
-function migrate() {
-  const db = getDb();
+async function migrate() {
+  const pool = getPool();
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schema = fs.readFileSync(schemaPath, 'utf-8');
 
-  db.exec(schema);
-
-  // Add name column if missing (existing DBs)
-  try {
-    db.exec("ALTER TABLE users ADD COLUMN name TEXT NOT NULL DEFAULT ''");
-  } catch { /* column already exists */ }
-
+  await pool.query(schema);
   logger.info('Database migration complete');
 }
 

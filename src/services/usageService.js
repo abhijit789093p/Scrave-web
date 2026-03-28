@@ -1,25 +1,24 @@
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 
-function getCurrentMonthUsage(apiKeyId) {
-  const db = getDb();
-  const row = db.prepare(`
-    SELECT COUNT(*) as count FROM usage_logs
-    WHERE api_key_id = ?
-    AND created_at >= date('now', 'start of month')
-  `).get(apiKeyId);
-  return row.count;
+async function getCurrentMonthUsage(apiKeyId) {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    "SELECT COUNT(*) as count FROM usage_logs WHERE api_key_id = $1 AND created_at >= date_trunc('month', now())",
+    [apiKeyId]
+  );
+  return parseInt(rows[0].count, 10);
 }
 
-function recordUsage(apiKeyId, endpoint, statusCode, responseTimeMs) {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO usage_logs (api_key_id, endpoint, status_code, response_time_ms)
-    VALUES (?, ?, ?, ?)
-  `).run(apiKeyId, endpoint, statusCode, responseTimeMs);
+async function recordUsage(apiKeyId, endpoint, statusCode, responseTimeMs) {
+  const pool = getPool();
+  await pool.query(
+    'INSERT INTO usage_logs (api_key_id, endpoint, status_code, response_time_ms) VALUES ($1, $2, $3, $4)',
+    [apiKeyId, endpoint, statusCode, responseTimeMs]
+  );
 }
 
-function getUsageSummary(apiKeyId, monthlyLimit) {
-  const used = getCurrentMonthUsage(apiKeyId);
+async function getUsageSummary(apiKeyId, monthlyLimit) {
+  const used = await getCurrentMonthUsage(apiKeyId);
   return {
     used,
     limit: monthlyLimit,

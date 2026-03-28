@@ -1,12 +1,12 @@
 const { Router } = require('express');
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 
 const router = Router();
 
-router.get('/health', (req, res) => {
+router.get('/health', async (req, res) => {
   let dbOk = false;
   try {
-    getDb().prepare('SELECT 1').get();
+    await getPool().query('SELECT 1');
     dbOk = true;
   } catch { /* db not ready */ }
 
@@ -19,32 +19,25 @@ router.get('/health', (req, res) => {
   });
 });
 
-router.get('/stats', (req, res) => {
-  const db = getDb();
+router.get('/stats', async (req, res) => {
+  const pool = getPool();
 
-  // Total captures served
-  const totalCaptures = db.prepare(
+  const { rows: captureRows } = await pool.query(
     "SELECT COUNT(*) as count FROM usage_logs WHERE endpoint IN ('/screenshot', '/pdf')"
-  ).get().count;
+  );
+  const totalCaptures = parseInt(captureRows[0].count, 10);
 
-  // Average response time (ms)
-  const avgRow = db.prepare(
+  const { rows: avgRows } = await pool.query(
     "SELECT AVG(response_time_ms) as avg FROM usage_logs WHERE endpoint IN ('/screenshot', '/pdf') AND response_time_ms > 0"
-  ).get();
-  const avgResponseMs = avgRow.avg ? Math.round(avgRow.avg) : 0;
+  );
+  const avgResponseMs = avgRows[0].avg ? Math.round(parseFloat(avgRows[0].avg)) : 0;
 
-  // Total registered users
-  const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+  const { rows: userRows } = await pool.query('SELECT COUNT(*) as count FROM users');
+  const totalUsers = parseInt(userRows[0].count, 10);
 
-  // Server uptime in seconds
   const uptimeSeconds = Math.floor(process.uptime());
 
-  res.json({
-    totalCaptures,
-    avgResponseMs,
-    totalUsers,
-    uptimeSeconds,
-  });
+  res.json({ totalCaptures, avgResponseMs, totalUsers, uptimeSeconds });
 });
 
 module.exports = router;

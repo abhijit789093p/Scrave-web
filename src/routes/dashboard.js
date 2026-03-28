@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 const apiKeyUtil = require('../utils/apiKey');
 const jwtAuth = require('../middleware/jwtAuth');
 
@@ -8,27 +8,33 @@ const router = Router();
 // All dashboard routes require JWT
 router.use(jwtAuth);
 
-// GET /dashboard/account — user info + key prefixes + usage summary
-router.get('/account', (req, res) => {
-  const db = getDb();
-  const user = db.prepare('SELECT id, name, email, tier, monthly_limit, created_at FROM users WHERE id = ?')
-    .get(req.jwtUser.id);
+// GET /dashboard/account
+router.get('/account', async (req, res) => {
+  const pool = getPool();
+
+  const { rows: userRows } = await pool.query(
+    'SELECT id, name, email, tier, monthly_limit, created_at FROM users WHERE id = $1',
+    [req.jwtUser.id]
+  );
+  const user = userRows[0];
 
   if (!user) {
     return res.status(404).json({ error: { message: 'User not found', code: 'NOT_FOUND' } });
   }
 
-  const keys = db.prepare(
-    'SELECT id, key_prefix, name, active, created_at FROM api_keys WHERE user_id = ? ORDER BY created_at DESC'
-  ).all(user.id);
+  const { rows: keys } = await pool.query(
+    'SELECT id, key_prefix, name, active, created_at FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC',
+    [user.id]
+  );
 
-  // Usage for active key
   const activeKey = keys.find((k) => k.active);
   let usage = { used: 0, limit: user.monthly_limit, remaining: user.monthly_limit, resetDate: '' };
   if (activeKey) {
-    const count = db.prepare(
-      "SELECT COUNT(*) as count FROM usage_logs WHERE api_key_id = ? AND created_at >= date('now', 'start of month')"
-    ).get(activeKey.id).count;
+    const { rows: countRows } = await pool.query(
+      "SELECT COUNT(*) as count FROM usage_logs WHERE api_key_id = $1 AND created_at >= date_trunc('month', now())",
+      [activeKey.id]
+    );
+    const count = parseInt(countRows[0].count, 10);
     const now = new Date();
     const resetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().split('T')[0];
     usage = { used: count, limit: user.monthly_limit, remaining: Math.max(0, user.monthly_limit - count), resetDate };
@@ -41,40 +47,41 @@ router.get('/account', (req, res) => {
   });
 });
 
-// GET /dashboard/history — recent usage logs
-router.get('/history', (req, res) => {
-  const db = getDb();
+// GET /dashboard/history
+router.get('/history', async (req, res) => {
+  const pool = getPool();
 
-  const activeKey = db.prepare(
-    'SELECT id FROM api_keys WHERE user_id = ? AND active = 1'
-  ).get(req.jwtUser.id);
+  const { rows: keyRows } = await pool.query(
+    'SELECT id FROM api_keys WHERE user_id = $1 AND active = 1',
+    [req.jwtUser.id]
+  );
 
-  if (!activeKey) {
+  if (!keyRows.length) {
     return res.json({ logs: [] });
   }
 
-  const logs = db.prepare(
-    'SELECT endpoint, status_code, response_time_ms, created_at FROM usage_logs WHERE api_key_id = ? ORDER BY created_at DESC LIMIT 20'
-  ).all(activeKey.id);
+  const { rows: logs } = await pool.query(
+    'SELECT endpoint, status_code, response_time_ms, created_at FROM usage_logs WHERE api_key_id = $1 ORDER BY created_at DESC LIMIT 20',
+    [keyRows[0].id]
+  );
 
   res.json({ logs });
 });
 
-// POST /dashboard/regenerate-key — deactivate old key, create new one
-router.post('/regenerate-key', (req, res) => {
-  const db = getDb();
+// POST /dashboard/regenerate-key
+router.post('/regenerate-key', async (req, res) => {
+  const pool = getPool();
 
-  // Deactivate all existing keys
-  db.prepare('UPDATE api_keys SET active = 0 WHERE user_id = ?').run(req.jwtUser.id);
+  await pool.query('UPDATE api_keys SET active = 0 WHERE user_id = $1', [req.jwtUser.id]);
 
-  // Generate new key
   const rawKey = apiKeyUtil.generate();
   const keyHash = apiKeyUtil.hash(rawKey);
   const keyPrefix = apiKeyUtil.getPrefix(rawKey);
 
-  db.prepare(
-    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES (?, ?, ?)'
-  ).run(req.jwtUser.id, keyHash, keyPrefix);
+  await pool.query(
+    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES ($1, $2, $3)',
+    [req.jwtUser.id, keyHash, keyPrefix]
+  );
 
   res.json({
     message: 'New API key generated. Old key is now deactivated.',

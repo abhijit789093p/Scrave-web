@@ -1,7 +1,7 @@
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 const apiKeyUtil = require('../utils/apiKey');
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
   const rawKey = req.headers['x-api-key'];
 
   if (!rawKey) {
@@ -9,14 +9,16 @@ function authMiddleware(req, res, next) {
   }
 
   const keyHash = apiKeyUtil.hash(rawKey);
-  const db = getDb();
+  const pool = getPool();
 
-  const keyRow = db.prepare(`
+  const { rows } = await pool.query(`
     SELECT ak.id as key_id, ak.user_id, ak.active, u.tier, u.monthly_limit, u.email
     FROM api_keys ak
     JOIN users u ON u.id = ak.user_id
-    WHERE ak.key_hash = ?
-  `).get(keyHash);
+    WHERE ak.key_hash = $1
+  `, [keyHash]);
+
+  const keyRow = rows[0];
 
   if (!keyRow || !keyRow.active) {
     return res.status(401).json({ error: { message: 'Invalid or inactive API key', code: 'UNAUTHORIZED' } });

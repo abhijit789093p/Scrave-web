@@ -1,43 +1,46 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 const apiKeyUtil = require('../utils/apiKey');
 const config = require('../config');
 
 const SALT_ROUNDS = 10;
 
 async function register(name, email, password) {
-  const db = getDb();
+  const pool = getPool();
 
-  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
-  if (existing) {
+  const { rows: existing } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+  if (existing.length) {
     throw Object.assign(new Error('Email already registered'), { status: 409 });
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-  const result = db.prepare(
-    'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)'
-  ).run(name, email, passwordHash);
+  const { rows } = await pool.query(
+    'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
+    [name, email, passwordHash]
+  );
 
-  const userId = result.lastInsertRowid;
+  const userId = rows[0].id;
 
   // Generate API key
   const rawKey = apiKeyUtil.generate();
   const keyHash = apiKeyUtil.hash(rawKey);
   const keyPrefix = apiKeyUtil.getPrefix(rawKey);
 
-  db.prepare(
-    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES (?, ?, ?)'
-  ).run(userId, keyHash, keyPrefix);
+  await pool.query(
+    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES ($1, $2, $3)',
+    [userId, keyHash, keyPrefix]
+  );
 
   return { userId, apiKey: rawKey, name, email };
 }
 
 async function login(email, password) {
-  const db = getDb();
+  const pool = getPool();
 
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const user = rows[0];
   if (!user) {
     throw Object.assign(new Error('Invalid credentials'), { status: 401 });
   }
@@ -51,10 +54,10 @@ async function login(email, password) {
     expiresIn: '30d',
   });
 
-  // Also return API keys
-  const keys = db.prepare(
-    'SELECT key_prefix, name, active, created_at FROM api_keys WHERE user_id = ? AND active = 1'
-  ).all(user.id);
+  const { rows: keys } = await pool.query(
+    'SELECT key_prefix, name, active, created_at FROM api_keys WHERE user_id = $1 AND active = 1',
+    [user.id]
+  );
 
   return { token, user: { id: user.id, name: user.name || '', email: user.email, tier: user.tier }, keys };
 }

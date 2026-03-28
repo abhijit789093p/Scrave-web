@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const config = Object.freeze({
   PORT: parseInt(process.env.PORT, 10) || 3000,
-  DATABASE_PATH: process.env.DATABASE_PATH || './data/scrave.db',
+  DATABASE_URL: process.env.DATABASE_URL || '',
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   QUEUE_MODE: process.env.QUEUE_MODE || 'memory',
   JWT_SECRET: process.env.JWT_SECRET || 'dev-secret',

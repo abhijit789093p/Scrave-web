@@ -1,24 +1,17 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+const { Pool } = require('pg');
 const config = require('../config');
 
-let db;
+const pool = new Pool({
+  connectionString: config.DATABASE_URL,
+  ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
 
-function getDb() {
-  if (!db) {
-    const dbPath = path.resolve(config.DATABASE_PATH);
-    db = new Database(dbPath);
-    db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
-  }
-  return db;
+function getPool() {
+  return pool;
 }
 
-function closeDb() {
-  if (db) {
-    db.close();
-    db = null;
-  }
+async function closeDb() {
+  await pool.end();
 }
 
-module.exports = { getDb, closeDb };
+module.exports = { getPool, closeDb };

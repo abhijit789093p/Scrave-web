@@ -1,7 +1,7 @@
 const { getCurrentMonthUsage, recordUsage } = require('../services/usageService');
 
-function usageTracker(req, res, next) {
-  const usage = getCurrentMonthUsage(req.apiKey.id);
+async function usageTracker(req, res, next) {
+  const usage = await getCurrentMonthUsage(req.apiKey.id);
 
   if (usage >= req.user.monthlyLimit) {
     return res.status(429).json({

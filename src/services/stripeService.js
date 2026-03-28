@@ -1,6 +1,6 @@
 const Stripe = require('stripe');
 const config = require('../config');
-const { getDb } = require('../db/connection');
+const { getPool } = require('../db/connection');
 const logger = require('../utils/logger');
 
 const stripe = config.STRIPE_SECRET_KEY ? new Stripe(config.STRIPE_SECRET_KEY) : null;
@@ -16,13 +16,13 @@ async function createCheckoutSession(userId, email, plan) {
   const tierInfo = PRICE_TO_TIER[plan];
   if (!tierInfo) throw Object.assign(new Error('Invalid plan'), { status: 400 });
 
-  const db = getDb();
-  let user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  const pool = getPool();
+  const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+  const user = rows[0];
 
-  // Create Stripe customer if needed
   if (!user.stripe_customer_id) {
     const customer = await stripe.customers.create({ email, metadata: { userId: String(userId) } });
-    db.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').run(customer.id, userId);
+    await pool.query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customer.id, userId]);
     user.stripe_customer_id = customer.id;
   }
 
@@ -42,8 +42,8 @@ async function createCheckoutSession(userId, email, plan) {
       quantity: 1,
     }],
     metadata: { userId: String(userId), plan },
-    success_url: `http://localhost:${config.PORT}/?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `http://localhost:${config.PORT}/#pricing`,
+    success_url: `${config.NODE_ENV === 'production' ? 'https' : 'http'}://localhost:${config.PORT}/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.NODE_ENV === 'production' ? 'https' : 'http'}://localhost:${config.PORT}/#pricing`,
   });
 
   return { url: session.url, sessionId: session.id };
@@ -53,7 +53,7 @@ async function handleWebhook(rawBody, signature) {
   if (!stripe) return;
 
   const event = stripe.webhooks.constructEvent(rawBody, signature, config.STRIPE_WEBHOOK_SECRET);
-  const db = getDb();
+  const pool = getPool();
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -61,8 +61,8 @@ async function handleWebhook(rawBody, signature) {
       const { userId, plan } = session.metadata;
       const tierInfo = PRICE_TO_TIER[plan];
       if (tierInfo && userId) {
-        db.prepare('UPDATE users SET tier = ?, monthly_limit = ? WHERE id = ?')
-          .run(tierInfo.tier, tierInfo.limit, parseInt(userId));
+        await pool.query('UPDATE users SET tier = $1, monthly_limit = $2 WHERE id = $3',
+          [tierInfo.tier, tierInfo.limit, parseInt(userId)]);
         logger.info(`User ${userId} upgraded to ${plan}`);
       }
       break;
@@ -70,8 +70,8 @@ async function handleWebhook(rawBody, signature) {
     case 'customer.subscription.deleted': {
       const sub = event.data.object;
       const customerId = sub.customer;
-      db.prepare('UPDATE users SET tier = ?, monthly_limit = ? WHERE stripe_customer_id = ?')
-        .run('free', config.TIER_LIMITS.free, customerId);
+      await pool.query('UPDATE users SET tier = $1, monthly_limit = $2 WHERE stripe_customer_id = $3',
+        ['free', config.TIER_LIMITS.free, customerId]);
       logger.info(`Customer ${customerId} downgraded to free`);
       break;
     }
@@ -83,15 +83,15 @@ async function handleWebhook(rawBody, signature) {
 async function createPortalSession(userId) {
   if (!stripe) throw Object.assign(new Error('Stripe not configured'), { status: 503 });
 
-  const db = getDb();
-  const user = db.prepare('SELECT stripe_customer_id FROM users WHERE id = ?').get(userId);
-  if (!user?.stripe_customer_id) {
+  const pool = getPool();
+  const { rows } = await pool.query('SELECT stripe_customer_id FROM users WHERE id = $1', [userId]);
+  if (!rows[0]?.stripe_customer_id) {
     throw Object.assign(new Error('No billing account found'), { status: 404 });
   }
 
   const session = await stripe.billingPortal.sessions.create({
-    customer: user.stripe_customer_id,
-    return_url: `http://localhost:${config.PORT}/`,
+    customer: rows[0].stripe_customer_id,
+    return_url: `${config.NODE_ENV === 'production' ? 'https' : 'http'}://localhost:${config.PORT}/`,
   });
 
   return { url: session.url };

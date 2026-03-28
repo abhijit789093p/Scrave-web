@@ -53,7 +53,7 @@ app.use(errorHandler);
 
 async function start() {
   // Run database migrations
-  migrate();
+  await migrate();
 
   // Start queue worker
   startWorker();
@@ -68,7 +68,7 @@ async function start() {
 async function shutdown() {
   logger.info('Shutting down...');
   await closeBrowser();
-  closeDb();
+  await closeDb();
   process.exit(0);
 }
 
