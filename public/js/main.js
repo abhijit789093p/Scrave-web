@@ -397,12 +397,8 @@
     });
     agreeBox.addEventListener('change', checkFormValid);
     const errEl = document.getElementById('reg-error');
-    const successEl = document.getElementById('reg-success');
-    const keyDisplay = document.getElementById('api-key-display');
     const btnText = document.getElementById('reg-btn-text');
     const spinner = document.getElementById('reg-spinner');
-    const copyBtn = document.getElementById('copy-key-btn');
-    const copyConfirm = document.getElementById('copy-confirm');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -438,26 +434,16 @@
           localStorage.setItem('sf_token', loginData.token);
         }
 
-        form.hidden = true;
-        keyDisplay.textContent = data.apiKey;
-        successEl.hidden = false;
+        // Redirect to dashboard — user generates key there
+        window.location.href = '/dashboard.html';
       } catch (err) {
         errEl.textContent = err.message;
         errEl.hidden = false;
-        btnText.textContent = 'Get API Key';
+        btnText.textContent = 'Register';
         spinner.hidden = true;
         form.querySelector('.btn-submit').disabled = false;
       }
     });
-
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(keyDisplay.textContent).then(() => {
-          copyConfirm.hidden = false;
-          setTimeout(() => { copyConfirm.hidden = true; }, 2000);
-        });
-      });
-    }
   }
 
   /* ── Login Form ── */

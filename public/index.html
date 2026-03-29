@@ -348,20 +348,7 @@
         <p id="reg-error" class="form-error" hidden></p>
       </form>
 
-      <!-- Success state -->
-      <div id="reg-success" class="reg-success" hidden>
-        <div class="success-icon">&#10003;</div>
-        <h3>Welcome aboard!</h3>
-        <p class="success-note">Your API key is below. Save it now &mdash; it won't be shown again.</p>
-        <div class="api-key-box">
-          <code id="api-key-display"></code>
-          <button type="button" class="btn-copy" id="copy-key-btn" title="Copy">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          </button>
-        </div>
-        <p id="copy-confirm" class="copy-confirm" hidden>Copied!</p>
-        <a href="/dashboard.html" class="btn btn-primary btn-block" style="margin-top:20px;">Go to Dashboard &rarr;</a>
-      </div>
+      <!-- Success — redirect handled by JS -->
 
       <p class="modal-switch">Already have an account? <a href="#" onclick="openModal('login'); return false;">Login</a></p>
     </div>
