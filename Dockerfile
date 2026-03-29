@@ -2,7 +2,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install only the minimal system deps Chromium needs
+# Install minimal system deps for Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
     libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 \
@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation wget ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
+COPY package.json ./
 
-RUN npm ci
+RUN npm install --omit=dev
 
 # Install just Chromium browser
 RUN npx playwright install chromium
