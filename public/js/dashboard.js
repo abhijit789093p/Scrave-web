@@ -54,17 +54,45 @@
     document.getElementById('usage-bar').style.width = pct + '%';
     document.getElementById('usage-bar-text').textContent = pct + '%';
 
-    // API key prefix
+    // API key state
     const activeKey = keys.find((k) => k.active);
     if (activeKey) {
-      document.getElementById('dash-key-prefix').textContent = activeKey.prefix + '••••••••••••';
-      document.getElementById('dash-key-status').textContent = 'Active';
+      showKeyPrefix(activeKey.prefix);
     } else {
-      document.getElementById('dash-key-prefix').textContent = 'No active key';
-      document.getElementById('dash-key-status').textContent = 'None';
-      document.getElementById('dash-key-status').style.background = 'rgba(236,72,153,0.12)';
-      document.getElementById('dash-key-status').style.color = 'var(--hue-magenta)';
+      showNoKey();
     }
+  }
+
+  function showNoKey() {
+    document.getElementById('dash-key-value').textContent = 'No key generated yet';
+    document.getElementById('dash-key-value').style.color = 'var(--text-dim)';
+    document.getElementById('dash-key-status').hidden = true;
+    document.getElementById('key-copy-btn').hidden = true;
+    document.getElementById('key-warn').hidden = true;
+    document.getElementById('gen-key-btn').textContent = 'Generate Key';
+    document.getElementById('key-description').textContent = 'Generate your API key to start using the Scrave API.';
+  }
+
+  function showKeyPrefix(prefix) {
+    document.getElementById('dash-key-value').textContent = prefix + '••••••••••••';
+    document.getElementById('dash-key-value').style.color = '';
+    document.getElementById('dash-key-status').hidden = false;
+    document.getElementById('dash-key-status').textContent = 'Active';
+    document.getElementById('key-copy-btn').hidden = true;
+    document.getElementById('key-warn').hidden = true;
+    document.getElementById('gen-key-btn').textContent = 'Regenerate Key';
+    document.getElementById('key-description').textContent = 'Your active key prefix is shown below. If you lost your key, regenerate a new one.';
+  }
+
+  function showFullKey(apiKey) {
+    document.getElementById('dash-key-value').textContent = apiKey;
+    document.getElementById('dash-key-value').style.color = 'var(--hue-teal)';
+    document.getElementById('dash-key-status').hidden = false;
+    document.getElementById('dash-key-status').textContent = 'Active';
+    document.getElementById('key-copy-btn').hidden = false;
+    document.getElementById('key-warn').hidden = false;
+    document.getElementById('gen-key-btn').textContent = 'Regenerate Key';
+    document.getElementById('key-description').textContent = 'Your active key prefix is shown below. If you lost your key, regenerate a new one.';
   }
 
   function renderHistory(logs) {
@@ -87,17 +115,17 @@
     });
   }
 
-  // Regenerate key
-  document.getElementById('regen-btn').addEventListener('click', async () => {
-    if (!confirm('This will deactivate your current key immediately. Continue?')) return;
+  // Generate / Regenerate key
+  document.getElementById('gen-key-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('gen-key-btn');
+    const isRegenerate = btn.textContent === 'Regenerate Key';
 
-    const btnText = document.getElementById('regen-btn-text');
-    const spinner = document.getElementById('regen-spinner');
-    const btn = document.getElementById('regen-btn');
+    if (isRegenerate) {
+      if (!confirm('This will deactivate your current key immediately. Continue?')) return;
+    }
 
-    btnText.textContent = 'Generating...';
-    spinner.hidden = false;
     btn.disabled = true;
+    btn.textContent = 'Generating...';
 
     try {
       const res = await fetch('/dashboard/regenerate-key', { method: 'POST', headers });
@@ -105,31 +133,23 @@
 
       if (!res.ok) throw new Error(data.error?.message || 'Failed');
 
-      // Show new key
-      document.getElementById('regen-key-display').textContent = data.apiKey;
-      document.getElementById('regen-success').hidden = false;
-
-      // Update prefix display
-      document.getElementById('dash-key-prefix').textContent = data.prefix + '••••••••••••';
-
-      btnText.textContent = 'Regenerate Key';
-      spinner.hidden = true;
+      showFullKey(data.apiKey);
+      btn.textContent = 'Regenerate Key';
       btn.disabled = false;
     } catch (err) {
       alert('Error: ' + err.message);
-      btnText.textContent = 'Regenerate Key';
-      spinner.hidden = true;
+      btn.textContent = isRegenerate ? 'Regenerate Key' : 'Generate Key';
       btn.disabled = false;
     }
   });
 
-  // Copy regenerated key
-  document.getElementById('regen-copy-btn').addEventListener('click', () => {
-    const key = document.getElementById('regen-key-display').textContent;
+  // Copy key
+  document.getElementById('key-copy-btn').addEventListener('click', () => {
+    const key = document.getElementById('dash-key-value').textContent;
     navigator.clipboard.writeText(key).then(() => {
-      const confirm = document.getElementById('regen-copy-confirm');
-      confirm.hidden = false;
-      setTimeout(() => { confirm.hidden = true; }, 2000);
+      const msg = document.getElementById('key-copy-confirm');
+      msg.hidden = false;
+      setTimeout(() => { msg.hidden = true; }, 2000);
     });
   });
 

@@ -23,17 +23,7 @@ async function register(name, email, password) {
 
   const userId = rows[0].id;
 
-  // Generate API key
-  const rawKey = apiKeyUtil.generate();
-  const keyHash = apiKeyUtil.hash(rawKey);
-  const keyPrefix = apiKeyUtil.getPrefix(rawKey);
-
-  await pool.query(
-    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES ($1, $2, $3)',
-    [userId, keyHash, keyPrefix]
-  );
-
-  return { userId, apiKey: rawKey, name, email };
+  return { userId, name, email };
 }
 
 async function login(email, password) {

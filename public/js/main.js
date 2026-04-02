@@ -398,7 +398,6 @@
     agreeBox.addEventListener('change', checkFormValid);
     const errEl = document.getElementById('reg-error');
     const btnText = document.getElementById('reg-btn-text');
-    const spinner = document.getElementById('reg-spinner');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -409,7 +408,6 @@
       const password = document.getElementById('reg-password').value;
 
       btnText.textContent = 'Creating...';
-      spinner.hidden = false;
       form.querySelector('.btn-submit').disabled = true;
 
       try {
@@ -434,13 +432,11 @@
           localStorage.setItem('sf_token', loginData.token);
         }
 
-        // Redirect to dashboard — user generates key there
         window.location.href = '/dashboard.html';
       } catch (err) {
         errEl.textContent = err.message;
         errEl.hidden = false;
         btnText.textContent = 'Register';
-        spinner.hidden = true;
         form.querySelector('.btn-submit').disabled = false;
       }
     });
@@ -452,7 +448,6 @@
     if (!form) return;
     const errEl = document.getElementById('login-error');
     const btnText = document.getElementById('login-btn-text');
-    const spinner = document.getElementById('login-spinner');
 
     // Enable/disable login button
     const loginBtn = document.getElementById('login-submit-btn');
@@ -477,7 +472,6 @@
       const password = document.getElementById('login-password').value;
 
       btnText.textContent = 'Logging in...';
-      spinner.hidden = false;
       form.querySelector('.btn-submit').disabled = true;
 
       try {
@@ -497,7 +491,6 @@
         errEl.textContent = err.message;
         errEl.hidden = false;
         btnText.textContent = 'Login';
-        spinner.hidden = true;
         form.querySelector('.btn-submit').disabled = false;
       }
     });

@@ -41,7 +41,6 @@
 
       <!-- Loading state -->
       <div id="dash-loading" class="dash-loading">
-        <div class="spinner" style="width:24px;height:24px;border-width:3px;"></div>
         <span>Loading dashboard...</span>
       </div>
 
@@ -88,30 +87,20 @@
         <!-- API Key section -->
         <div class="dash-section">
           <h2>API Key</h2>
-          <p class="dash-section-sub">Your active key prefix is shown below. If you lost your key, regenerate a new one.</p>
+          <p class="dash-section-sub" id="key-description">Generate your API key to start using the Scrave API.</p>
 
           <div class="key-row">
             <div class="key-display">
-              <code id="dash-key-prefix">sf_live_••••••••</code>
-              <span class="key-status" id="dash-key-status">Active</span>
-            </div>
-            <button class="btn btn-glass" id="regen-btn">
-              <span id="regen-btn-text">Regenerate Key</span>
-              <span id="regen-spinner" class="spinner" hidden></span>
-            </button>
-          </div>
-
-          <!-- New key display (hidden until regenerated) -->
-          <div id="regen-success" class="regen-success" hidden>
-            <div class="api-key-box">
-              <code id="regen-key-display"></code>
-              <button type="button" class="btn-copy" id="regen-copy-btn" title="Copy">
+              <code id="dash-key-value">No key generated yet</code>
+              <span class="key-status" id="dash-key-status" hidden>Active</span>
+              <button type="button" class="btn-copy" id="key-copy-btn" title="Copy" hidden>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
-            <p class="regen-warn">Save this key now — it won't be shown again. Your old key has been deactivated.</p>
-            <p id="regen-copy-confirm" class="copy-confirm" hidden>Copied!</p>
+            <button class="btn btn-primary" id="gen-key-btn">Generate Key</button>
           </div>
+          <p id="key-warn" class="regen-warn" hidden>Save this key now — it won't be shown again.</p>
+          <p id="key-copy-confirm" class="copy-confirm" hidden>Copied!</p>
         </div>
 
         <!-- Recent activity -->
