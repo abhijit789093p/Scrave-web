@@ -24,6 +24,9 @@ const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 
+// Trust proxy (Render, Railway, etc.) so rate limiter sees real client IPs
+app.set('trust proxy', 1);
+
 // Security & parsing
 app.use(helmet({ contentSecurityPolicy: false }));
 
@@ -43,7 +46,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Public routes
 app.use('/api/v1', healthRoutes);
-app.use('/auth', authLimiter, authRoutes);
+app.use('/auth', authRoutes);
 
 // Protected API routes
 app.use('/api/v1', authMiddleware, usageTracker, screenshotRoutes);

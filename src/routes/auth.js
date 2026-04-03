@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { z } = require('zod');
 const authService = require('../services/authService');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 const router = Router();
 
@@ -34,7 +35,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', authLimiter, async (req, res, next) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
     const result = await authService.login(email, password);
@@ -66,7 +67,7 @@ router.get('/verify-email', async (req, res, next) => {
 });
 
 // Forgot password — request reset link
-router.post('/forgot-password', async (req, res, next) => {
+router.post('/forgot-password', authLimiter, async (req, res, next) => {
   try {
     const { email } = z.object({ email: z.string().email() }).parse(req.body);
     const result = await authService.requestPasswordReset(email);
