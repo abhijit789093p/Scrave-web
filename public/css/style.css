@@ -849,12 +849,14 @@ h2 {
   word-break: break-all; text-align: left;
 }
 .btn-copy {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.08);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px; padding: 8px 10px;
+  border-radius: 8px; padding: 8px 14px;
   color: var(--text-mid); cursor: pointer;
   transition: all 0.25s;
-  display: flex; align-items: center;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--ff-body); font-size: 0.78rem; font-weight: 600;
+  white-space: nowrap;
 }
 .btn-copy:hover { background: rgba(255,255,255,0.12); color: #fff; }
 .copy-confirm {
