@@ -26,9 +26,17 @@ const app = express();
 
 // Security & parsing
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors());
+
+// CORS — restrict to app domain in production
+const corsOptions = config.NODE_ENV === 'production' && config.APP_URL
+  ? { origin: config.APP_URL, credentials: true }
+  : {};
+app.use(cors(corsOptions));
+
 app.use(globalLimiter);
-app.use(express.json());
+
+// Request body size limit — prevents payload attacks
+app.use(express.json({ limit: '1mb' }));
 
 // Static files (landing page)
 app.use(express.static(path.join(__dirname, '..', 'public')));

@@ -496,6 +496,64 @@
     });
   }
 
+  /* ── Forgot Password Form ── */
+  function initForgotForm() {
+    const form = document.getElementById('forgot-form');
+    if (!form) return;
+    const emailInput = document.getElementById('forgot-email');
+    const btn = document.getElementById('forgot-submit-btn');
+    const btnText = document.getElementById('forgot-btn-text');
+    const errEl = document.getElementById('forgot-error');
+    const successEl = document.getElementById('forgot-success');
+
+    emailInput.addEventListener('input', () => {
+      btn.disabled = !(emailInput.value.trim().length > 0 && emailInput.validity.valid);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.hidden = true;
+      successEl.hidden = true;
+
+      btnText.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput.value.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message || 'Failed');
+
+        successEl.textContent = data.message;
+        successEl.hidden = false;
+        btnText.textContent = 'Send Reset Link';
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.hidden = false;
+        btnText.textContent = 'Send Reset Link';
+        btn.disabled = false;
+      }
+    });
+  }
+
+  /* ── Check for verified=true in URL ── */
+  function checkVerifiedParam() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === 'true') {
+      // Show a brief notification
+      const note = document.createElement('div');
+      note.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--hue-teal);color:#fff;padding:12px 24px;border-radius:10px;font-size:0.9rem;font-weight:600;z-index:999;';
+      note.textContent = 'Email verified successfully! You can now login.';
+      document.body.appendChild(note);
+      setTimeout(() => note.remove(), 5000);
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+    }
+  }
+
   /* ── Boot ── */
   document.addEventListener('DOMContentLoaded', () => {
     initReveal();
@@ -508,5 +566,7 @@
     initModals();
     initRegisterForm();
     initLoginForm();
+    initForgotForm();
+    checkVerifiedParam();
   });
 })();

@@ -804,6 +804,10 @@ h2 {
   margin-top: 10px; font-size: 0.85rem;
   color: #f87171; text-align: left;
 }
+.form-success {
+  margin-top: 10px; font-size: 0.85rem;
+  color: var(--hue-teal); text-align: left;
+}
 
 /* Spinner */
 .spinner {

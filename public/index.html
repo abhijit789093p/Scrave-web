@@ -375,7 +375,31 @@
         <p id="login-error" class="form-error" hidden></p>
       </form>
 
+      <p class="modal-switch"><a href="#" onclick="openModal('forgot'); return false;">Forgot password?</a></p>
       <p class="modal-switch">Don't have an account? <a href="#" onclick="openModal('register'); return false;">Register</a></p>
+    </div>
+  </div>
+
+  <!-- ══ Forgot Password Modal ══ -->
+  <div class="modal-overlay" id="modal-forgot">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModals()">&times;</button>
+      <h2>Forgot password?</h2>
+      <p class="modal-sub">Enter your email and we'll send you a reset link.</p>
+
+      <form id="forgot-form" autocomplete="off">
+        <div class="form-group">
+          <label for="forgot-email">Email <span class="required">*</span></label>
+          <input type="email" id="forgot-email" placeholder="you@example.com" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-submit" id="forgot-submit-btn" disabled>
+          <span id="forgot-btn-text">Send Reset Link</span>
+        </button>
+        <p id="forgot-error" class="form-error" hidden></p>
+        <p id="forgot-success" class="form-success" hidden></p>
+      </form>
+
+      <p class="modal-switch">Remember your password? <a href="#" onclick="openModal('login'); return false;">Login</a></p>
     </div>
   </div>
 
