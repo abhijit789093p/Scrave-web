@@ -186,6 +186,8 @@ code { font-family: var(--ff-mono); }
 .btn-primary {
   background: linear-gradient(135deg, var(--hue-purple), var(--hue-cyan));
   color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
 }
 .btn-primary:hover {
@@ -206,7 +208,9 @@ code { font-family: var(--ff-mono); }
 .btn-nav {
   padding: 9px 20px; font-size: 0.84rem;
   background: linear-gradient(135deg, var(--hue-purple), var(--hue-cyan));
-  color: #fff; border-radius: var(--r-sm);
+  color: #fff; font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border-radius: var(--r-sm);
 }
 .btn-nav:hover { box-shadow: 0 6px 24px rgba(124, 58, 237, 0.35); transform: translateY(-1px); }
 .btn-block { width: 100%; text-align: center; }

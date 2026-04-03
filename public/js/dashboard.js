@@ -63,11 +63,17 @@
     }
   }
 
+  function maskKey(key) {
+    const visibleLen = Math.ceil(key.length * 0.2);
+    return key.substring(0, visibleLen) + '••••••••••••';
+  }
+
   function showNoKey() {
     document.getElementById('dash-key-value').textContent = 'No key generated yet';
     document.getElementById('dash-key-value').style.color = 'var(--text-dim)';
+    document.getElementById('dash-key-value').removeAttribute('data-full-key');
     document.getElementById('dash-key-status').hidden = true;
-    document.getElementById('key-copy-btn').hidden = true;
+    document.getElementById('key-copy-btn').style.visibility = 'hidden';
     document.getElementById('key-warn').hidden = true;
     document.getElementById('gen-key-btn').textContent = 'Generate Key';
     document.getElementById('key-description').textContent = 'Generate your API key to start using the Scrave API.';
@@ -76,23 +82,25 @@
   function showKeyPrefix(prefix) {
     document.getElementById('dash-key-value').textContent = prefix + '••••••••••••';
     document.getElementById('dash-key-value').style.color = '';
+    document.getElementById('dash-key-value').removeAttribute('data-full-key');
     document.getElementById('dash-key-status').hidden = false;
     document.getElementById('dash-key-status').textContent = 'Active';
-    document.getElementById('key-copy-btn').hidden = true;
+    document.getElementById('key-copy-btn').style.visibility = 'hidden';
     document.getElementById('key-warn').hidden = true;
     document.getElementById('gen-key-btn').textContent = 'Regenerate Key';
     document.getElementById('key-description').textContent = 'Your active key prefix is shown below. If you lost your key, regenerate a new one.';
   }
 
   function showFullKey(apiKey) {
-    document.getElementById('dash-key-value').textContent = apiKey;
+    document.getElementById('dash-key-value').textContent = maskKey(apiKey);
+    document.getElementById('dash-key-value').setAttribute('data-full-key', apiKey);
     document.getElementById('dash-key-value').style.color = 'var(--hue-teal)';
     document.getElementById('dash-key-status').hidden = false;
     document.getElementById('dash-key-status').textContent = 'Active';
-    document.getElementById('key-copy-btn').hidden = false;
+    document.getElementById('key-copy-btn').style.visibility = 'visible';
     document.getElementById('key-warn').hidden = false;
     document.getElementById('gen-key-btn').textContent = 'Regenerate Key';
-    document.getElementById('key-description').textContent = 'Your active key prefix is shown below. If you lost your key, regenerate a new one.';
+    document.getElementById('key-description').textContent = 'Your key is masked below. Click copy to get the full key.';
   }
 
   function renderHistory(logs) {
@@ -143,9 +151,10 @@
     }
   });
 
-  // Copy key
+  // Copy key — copies full key from data attribute, not masked text
   document.getElementById('key-copy-btn').addEventListener('click', () => {
-    const key = document.getElementById('dash-key-value').textContent;
+    const el = document.getElementById('dash-key-value');
+    const key = el.getAttribute('data-full-key') || el.textContent;
     navigator.clipboard.writeText(key).then(() => {
       const msg = document.getElementById('key-copy-confirm');
       msg.hidden = false;

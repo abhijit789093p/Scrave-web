@@ -1,7 +1,12 @@
 const crypto = require('crypto');
 
 function generate() {
-  const random = crypto.randomBytes(24).toString('hex');
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const bytes = crypto.randomBytes(40);
+  let random = '';
+  for (let i = 0; i < 40; i++) {
+    random += chars[bytes[i] % chars.length];
+  }
   return `sf_live_${random}`;
 }
 
