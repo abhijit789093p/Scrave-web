@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { screenshotSchema } = require('../utils/validate');
 const { addScreenshotJob } = require('../services/queue');
+const config = require('../config');
 
 const router = Router();
 
@@ -8,8 +9,15 @@ router.post('/screenshot', async (req, res, next) => {
   try {
     const parsed = screenshotSchema.parse(req.body);
 
-    // Add job to queue
-    const job = await addScreenshotJob(parsed);
+    const tier = req.user?.tier || 'free';
+    const tierInfo = {
+      tier,
+      priority: config.TIER_PRIORITY[tier] || 3,
+      tierConcurrency: config.TIER_CONCURRENCY[tier] || 2,
+    };
+
+    // Add job to queue with priority
+    const job = await addScreenshotJob(parsed, tierInfo);
 
     // Wait for the worker to finish
     const resultBase64 = await job.waitUntilFinished().catch(err => {

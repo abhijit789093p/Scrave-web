@@ -62,6 +62,19 @@ app.use('/dashboard', dashboardRoutes);
 // Error handler
 app.use(errorHandler);
 
+// Keep-alive self-ping to prevent Render idle shutdown
+function startKeepAlive() {
+  if (config.NODE_ENV !== 'production' || !config.APP_URL) return;
+
+  const interval = config.KEEP_ALIVE_INTERVAL; // default 10 min
+  setInterval(() => {
+    fetch(`${config.APP_URL}/api/v1/health`)
+      .then((res) => logger.info(`[KeepAlive] Ping OK (${res.status})`))
+      .catch((err) => logger.warn(`[KeepAlive] Ping failed: ${err.message}`));
+  }, interval);
+  logger.info(`[KeepAlive] Started — pinging ${config.APP_URL} every ${interval / 1000}s`);
+}
+
 async function start() {
   // Run database migrations
   await migrate();
@@ -72,6 +85,7 @@ async function start() {
   app.listen(config.PORT, () => {
     logger.info(`Scrave API running on http://localhost:${config.PORT}`);
     logger.info(`Environment: ${config.NODE_ENV}`);
+    startKeepAlive();
   });
 }
 

@@ -93,7 +93,7 @@
             <div class="key-display">
               <code id="dash-key-value">No key generated yet</code>
               <span class="key-status" id="dash-key-status" hidden>Active</span>
-              <button type="button" class="btn-copy" id="key-copy-btn" title="Copy" style="visibility:hidden">
+              <button type="button" class="btn-copy" id="key-copy-btn" title="Copy" >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                 Copy
               </button>
@@ -102,6 +102,19 @@
           </div>
           <p id="key-warn" class="regen-warn" hidden>Save this key now — it won't be shown again.</p>
           <p id="key-copy-confirm" class="copy-confirm" hidden>Copied!</p>
+        </div>
+
+        <!-- Support section (visible for paid tiers) -->
+        <div class="dash-section" id="support-section" hidden>
+          <h2>Dedicated Support</h2>
+          <p class="dash-section-sub">As a paid member, you have direct access to our support team.</p>
+          <div class="support-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <div>
+              <span class="support-label">Email us directly</span>
+              <a id="support-email-link" class="support-email" href=""></a>
+            </div>
+          </div>
         </div>
 
         <!-- Recent activity -->

@@ -24,22 +24,32 @@ function wrapJob(job, events) {
   return job;
 }
 
-async function addScreenshotJob(options) {
-  const jobOptions = { removeOnComplete: true, removeOnFail: true, timeout: 60000 };
+async function addScreenshotJob(options, tierInfo) {
+  const jobOptions = {
+    removeOnComplete: true, removeOnFail: true, timeout: 60000,
+    priority: tierInfo?.priority || 3,
+    tier: tierInfo?.tier || 'free',
+    tierConcurrency: tierInfo?.tierConcurrency || 2,
+  };
 
   if (isRedisMode) {
-    const job = await screenshotQueue.add('capture', options, jobOptions);
+    const job = await screenshotQueue.add('capture', options, { ...jobOptions, priority: jobOptions.priority });
     return wrapJob(job, screenshotEvents);
   } else {
     return await memoryScreenshotQueue.add('capture', options, jobOptions);
   }
 }
 
-async function addPdfJob(options) {
-  const jobOptions = { removeOnComplete: true, removeOnFail: true, timeout: 60000 };
+async function addPdfJob(options, tierInfo) {
+  const jobOptions = {
+    removeOnComplete: true, removeOnFail: true, timeout: 60000,
+    priority: tierInfo?.priority || 3,
+    tier: tierInfo?.tier || 'free',
+    tierConcurrency: tierInfo?.tierConcurrency || 2,
+  };
 
   if (isRedisMode) {
-    const job = await pdfQueue.add('capture', options, jobOptions);
+    const job = await pdfQueue.add('capture', options, { ...jobOptions, priority: jobOptions.priority });
     return wrapJob(job, pdfEvents);
   } else {
     return await memoryPdfQueue.add('capture', options, jobOptions);

@@ -134,11 +134,11 @@ async function requestPasswordReset(email) {
   const { rows } = await pool.query('SELECT id, name FROM users WHERE email = $1', [email]);
   if (!rows.length) {
     // Don't reveal if email exists — always return success
-    return { message: 'If that email exists, a reset link has been sent.' };
+    return { message: "We've sent a reset link to your email." };
   }
 
   const resetToken = generateToken();
-  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  const expires = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
 
   await pool.query(
     'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
@@ -149,7 +149,7 @@ async function requestPasswordReset(email) {
     console.error('Failed to send reset email:', err.message);
   });
 
-  return { message: 'If that email exists, a reset link has been sent.' };
+  return { message: "We've sent a reset link to your email." };
 }
 
 async function resetPassword(token, newPassword) {

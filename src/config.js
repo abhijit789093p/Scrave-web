@@ -20,6 +20,18 @@ const config = Object.freeze({
     pro: parseInt(process.env.PRO_TIER_LIMIT, 10) || 5000,
     business: parseInt(process.env.BUSINESS_TIER_LIMIT, 10) || 50000,
   },
+  TIER_CONCURRENCY: {
+    free: parseInt(process.env.FREE_CONCURRENCY, 10) || 1,
+    pro: parseInt(process.env.PRO_CONCURRENCY, 10) || 5,
+    business: parseInt(process.env.BUSINESS_CONCURRENCY, 10) || 15,
+  },
+  TIER_PRIORITY: {
+    free: 3,
+    pro: 2,
+    business: 1,
+  },
+  SUPPORT_EMAIL: process.env.SUPPORT_EMAIL || 'support@scrave.dev',
+  KEEP_ALIVE_INTERVAL: parseInt(process.env.KEEP_ALIVE_INTERVAL, 10) || 600000,
   MAX_LOGIN_ATTEMPTS: 5,
   LOCKOUT_MINUTES: 15,
 });

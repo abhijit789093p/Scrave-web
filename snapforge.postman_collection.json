@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "SnapForge API v1",
-    "description": "API collection for SnapForge's screenshot and PDF generation engine.",
+    "name": "Scrave API v1",
+    "description": "API collection for Scrave's screenshot and PDF generation engine.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

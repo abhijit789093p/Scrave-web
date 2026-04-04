@@ -142,6 +142,26 @@
 .status-ok { color: var(--hue-teal); font-weight: 600; }
 .status-err { color: var(--hue-magenta); font-weight: 600; }
 
+/* Support card */
+.support-card {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(4, 4, 12, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md); padding: 18px 22px;
+}
+.support-card svg { color: var(--hue-cyan); flex-shrink: 0; }
+.support-label {
+  display: block; font-size: 0.75rem; font-weight: 600;
+  color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 2px;
+}
+.support-email {
+  font-size: 0.95rem; font-weight: 600;
+  color: var(--hue-cyan); text-decoration: none;
+  transition: color 0.2s;
+}
+.support-email:hover { color: #fff; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .dash-stats { grid-template-columns: repeat(2, 1fr); }

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { pdfSchema } = require('../utils/validate');
 const { addPdfJob } = require('../services/queue');
+const config = require('../config');
 
 const router = Router();
 
@@ -8,7 +9,14 @@ router.post('/pdf', async (req, res, next) => {
   try {
     const parsed = pdfSchema.parse(req.body);
 
-    const job = await addPdfJob(parsed);
+    const tier = req.user?.tier || 'free';
+    const tierInfo = {
+      tier,
+      priority: config.TIER_PRIORITY[tier] || 3,
+      tierConcurrency: config.TIER_CONCURRENCY[tier] || 2,
+    };
+
+    const job = await addPdfJob(parsed, tierInfo);
 
     const resultBase64 = await job.waitUntilFinished().catch(err => {
       throw new Error('PDF generation failed: ' + err.message);

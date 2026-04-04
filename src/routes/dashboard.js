@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { getPool } = require('../db/connection');
 const apiKeyUtil = require('../utils/apiKey');
 const jwtAuth = require('../middleware/jwtAuth');
+const config = require('../config');
 
 const router = Router();
 
@@ -40,10 +41,16 @@ router.get('/account', async (req, res) => {
     usage = { used: count, limit: user.monthly_limit, remaining: Math.max(0, user.monthly_limit - count), resetDate };
   }
 
+  // Include support email for paid tiers
+  const support = (user.tier === 'pro' || user.tier === 'business')
+    ? { email: config.SUPPORT_EMAIL, type: 'dedicated' }
+    : { type: 'community' };
+
   res.json({
     user: { id: user.id, name: user.name || '', email: user.email, tier: user.tier, createdAt: user.created_at },
     keys: keys.map((k) => ({ id: k.id, prefix: k.key_prefix, name: k.name, active: !!k.active, createdAt: k.created_at })),
     usage,
+    support,
   });
 });
 

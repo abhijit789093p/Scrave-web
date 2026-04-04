@@ -820,6 +820,7 @@ h2 {
   border-top-color: #fff; border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
+.spinner[hidden] { display: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Success state */
@@ -863,6 +864,71 @@ h2 {
   font-size: 0.8rem; color: var(--hue-teal);
   margin-top: 8px; font-weight: 600;
 }
+
+/* ── Password toggle ── */
+.password-wrap {
+  position: relative;
+}
+.password-wrap input { padding-right: 44px; }
+.toggle-pw {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text-dim); padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s;
+}
+.toggle-pw:hover { color: var(--text-bright); }
+
+/* ── Inline validation hint ── */
+.field-hint {
+  font-size: 0.75rem; margin-top: 5px;
+  color: var(--text-dim);
+  transition: color 0.2s;
+}
+.field-hint.error { color: #f87171; }
+.field-hint.ok { color: var(--hue-teal); }
+
+/* ── Password strength rules ── */
+.pw-strength {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 8px;
+}
+.pw-rule {
+  font-size: 0.7rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  transition: all 0.25s;
+}
+.pw-rule.pass {
+  color: var(--hue-teal);
+  border-color: rgba(20, 184, 166, 0.3);
+  background: rgba(20, 184, 166, 0.08);
+}
+.pw-rule.fail {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.06);
+}
+
+/* ── Code block copy button ── */
+.code-block {
+  position: relative;
+}
+.code-copy-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px; padding: 5px 10px;
+  color: var(--text-dim); cursor: pointer;
+  font-family: var(--ff-body); font-size: 0.7rem; font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+  transition: all 0.25s;
+  opacity: 0;
+}
+.code-block:hover .code-copy-btn { opacity: 1; }
+.code-copy-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
 
 /* (curl details removed — now in docs) */
 
@@ -918,30 +984,61 @@ h2 {
 
 /* ── Footer ── */
 .footer {
-  padding: 36px 0;
+  padding: 60px 0 0;
   border-top: 1px solid var(--border-subtle);
+  margin-top: 40px;
 }
-.footer-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  font-size: 0.84rem; color: var(--text-dim);
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+}
+.footer-col {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.footer-col a {
+  color: var(--text-dim); font-size: 0.85rem;
+  transition: color 0.25s; text-decoration: none;
+}
+.footer-col a:hover { color: #fff; }
+.footer-heading {
+  font-family: var(--ff-display); font-weight: 700;
+  font-size: 0.85rem; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 4px;
 }
 .footer-brand {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--ff-display); font-weight: 700;
-  font-size: 0.95rem; color: var(--text-mid);
+  font-size: 1.1rem; color: var(--text-bright);
 }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a {
+.footer-tagline {
   color: var(--text-dim); font-size: 0.85rem;
-  transition: color 0.25s;
+  line-height: 1.5; max-width: 260px;
 }
-.footer-links a:hover { color: #fff; }
-.footer-social { display: flex; gap: 16px; }
+.footer-social { display: flex; gap: 16px; margin-top: 4px; }
 .social-link {
   color: var(--text-dim); transition: color 0.25s, transform 0.25s;
   display: flex; align-items: center;
 }
 .social-link:hover { color: #fff; transform: translateY(-2px); }
+.footer-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+  flex-shrink: 0;
+}
+.footer-bottom {
+  border-top: 1px solid var(--border-subtle);
+  padding: 24px 0;
+  font-size: 0.8rem; color: var(--text-dim);
+  text-align: center;
+}
 
 /* ═══════════════════════
    Scroll Reveal System
@@ -977,8 +1074,12 @@ h2 {
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
   .features-grid { grid-template-columns: 1fr; }
   .nav-links a:not(.btn-nav) { display: none; }
-  .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
-  .footer-links { justify-content: center; }
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+  .footer-brand-col { align-items: center; }
+  .footer-col { align-items: center; }
+  .footer-tagline { text-align: center; }
+  .footer-social { justify-content: center; }
+  .footer-status { justify-content: center; }
   .features, .docs, .pricing { padding: 80px 0; }
   .modal { margin: 16px; padding: 32px 24px; }
 }

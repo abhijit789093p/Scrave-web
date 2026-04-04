@@ -68,6 +68,11 @@
     fetch('/api/v1/stats')
       .then((r) => r.json())
       .then((data) => {
+        // Only show stats section if there's meaningful data
+        const hasData = (data.totalCaptures || 0) > 0 || (data.totalUsers || 0) > 0;
+        const statsSection = document.getElementById('stats-section');
+        if (statsSection && hasData) statsSection.hidden = false;
+
         // Set real targets
         const avgEl = document.getElementById('stat-avg-ms');
         const uptimeEl = document.getElementById('stat-uptime');
@@ -171,7 +176,7 @@
       {
         step: 0,
         lines: [
-          { type: 'cmd', text: 'curl -X POST http://localhost:3000/auth/register \\', speed: 30 },
+          { type: 'cmd', text: 'curl -X POST https://scrave.onrender.com/auth/register \\', speed: 30 },
           { type: 'cmd-cont', text: '  -H "Content-Type: application/json" \\', speed: 25 },
           { type: 'cmd-cont', text: '  -d \'{"email": "dev@example.com", "password": "s3cureP@ss"}\'', speed: 25 },
           { type: 'pause', ms: 800 },
@@ -199,7 +204,7 @@
         step: 2,
         lines: [
           { type: 'output', text: '' },
-          { type: 'cmd', text: 'curl -X POST http://localhost:3000/api/v1/screenshot \\', speed: 30 },
+          { type: 'cmd', text: 'curl -X POST https://scrave.onrender.com/api/v1/screenshot \\', speed: 30 },
           { type: 'cmd-cont', text: '  -H "x-api-key: sf_live_7a3f9c2d8e1b4f6a..." \\', speed: 25 },
           { type: 'cmd-cont', text: '  -H "Content-Type: application/json" \\', speed: 25 },
           { type: 'cmd-cont', text: '  -d \'{"url": "https://github.com", "fullPage": true}\' \\', speed: 25 },
@@ -368,6 +373,16 @@
         loginBtn.textContent = 'Dashboard';
         loginBtn.onclick = () => { window.location.href = '/dashboard.html'; };
       }
+      // Replace "Get API Key" button with Logout
+      const getKeyBtn = document.querySelector('.nav-links .btn-nav');
+      if (getKeyBtn) {
+        getKeyBtn.textContent = 'Logout';
+        getKeyBtn.onclick = function () {
+          localStorage.removeItem('sf_token');
+          window.location.href = '/';
+        };
+        getKeyBtn.removeAttribute('onclick');
+      }
     }
   }
 
@@ -387,7 +402,7 @@
       const valid = nameInput.value.trim().length > 0
         && emailInput.value.trim().length > 0
         && emailInput.validity.valid
-        && passInput.value.length >= 8
+        && isPasswordStrong(passInput.value)
         && agreeBox.checked;
       submitBtn.disabled = !valid;
     }
@@ -407,7 +422,7 @@
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-password').value;
 
-      btnText.textContent = 'Creating...';
+      showSpinner('reg-spinner', 'reg-btn-text', 'Creating...');
       form.querySelector('.btn-submit').disabled = true;
 
       try {
@@ -436,7 +451,7 @@
       } catch (err) {
         errEl.textContent = err.message;
         errEl.hidden = false;
-        btnText.textContent = 'Register';
+        hideSpinner('reg-spinner', 'reg-btn-text', 'Register');
         form.querySelector('.btn-submit').disabled = false;
       }
     });
@@ -471,7 +486,7 @@
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
 
-      btnText.textContent = 'Logging in...';
+      showSpinner('login-spinner', 'login-btn-text', 'Logging in...');
       form.querySelector('.btn-submit').disabled = true;
 
       try {
@@ -490,7 +505,7 @@
       } catch (err) {
         errEl.textContent = err.message;
         errEl.hidden = false;
-        btnText.textContent = 'Login';
+        hideSpinner('login-spinner', 'login-btn-text', 'Login');
         form.querySelector('.btn-submit').disabled = false;
       }
     });
@@ -515,7 +530,7 @@
       errEl.hidden = true;
       successEl.hidden = true;
 
-      btnText.textContent = 'Sending...';
+      showSpinner('forgot-spinner', 'forgot-btn-text', 'Sending...');
       btn.disabled = true;
 
       try {
@@ -529,11 +544,11 @@
 
         successEl.textContent = data.message;
         successEl.hidden = false;
-        btnText.textContent = 'Send Reset Link';
+        hideSpinner('forgot-spinner', 'forgot-btn-text', 'Send Reset Link');
       } catch (err) {
         errEl.textContent = err.message;
         errEl.hidden = false;
-        btnText.textContent = 'Send Reset Link';
+        hideSpinner('forgot-spinner', 'forgot-btn-text', 'Send Reset Link');
         btn.disabled = false;
       }
     });
@@ -554,6 +569,89 @@
     }
   }
 
+  /* ── Password Toggle (global) ── */
+  window.togglePassword = function (btn) {
+    const input = btn.parentElement.querySelector('input');
+    const open = btn.querySelector('.eye-open');
+    const closed = btn.querySelector('.eye-closed');
+    if (input.type === 'password') {
+      input.type = 'text';
+      open.style.display = 'none';
+      closed.style.display = '';
+    } else {
+      input.type = 'password';
+      open.style.display = '';
+      closed.style.display = 'none';
+    }
+  };
+
+  /* ── Copy Code Block (global) ── */
+  window.copyCodeBlock = function (btn) {
+    const code = btn.closest('.code-block').querySelector('code');
+    navigator.clipboard.writeText(code.textContent).then(() => {
+      const orig = btn.innerHTML;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    });
+  };
+
+  /* ── Password Strength Checker ── */
+  function checkPasswordStrength(pw) {
+    return {
+      len: pw.length >= 8,
+      upper: /[A-Z]/.test(pw),
+      lower: /[a-z]/.test(pw),
+      num: /[0-9]/.test(pw),
+      special: /[^A-Za-z0-9]/.test(pw),
+    };
+  }
+
+  function updateStrengthUI(pw, prefix) {
+    var rules = checkPasswordStrength(pw);
+    var ids = { len: 'len', upper: 'upper', lower: 'lower', num: 'num', special: 'special' };
+    var allPass = true;
+    for (var key in ids) {
+      var el = document.getElementById(prefix + '-' + ids[key]);
+      if (!el) continue;
+      if (pw.length === 0) {
+        el.className = 'pw-rule';
+      } else if (rules[key]) {
+        el.className = 'pw-rule pass';
+      } else {
+        el.className = 'pw-rule fail';
+        allPass = false;
+      }
+    }
+    return allPass && pw.length > 0;
+  }
+
+  function isPasswordStrong(pw) {
+    var r = checkPasswordStrength(pw);
+    return r.len && r.upper && r.lower && r.num && r.special;
+  }
+
+  function initPasswordHints() {
+    var regPass = document.getElementById('reg-password');
+    if (!regPass) return;
+    regPass.addEventListener('input', function () {
+      updateStrengthUI(regPass.value, 'pw');
+    });
+  }
+
+  /* ── Spinner helpers ── */
+  function showSpinner(spinnerId, textId, loadingText) {
+    const spinner = document.getElementById(spinnerId);
+    const text = document.getElementById(textId);
+    if (spinner) spinner.hidden = false;
+    if (text) text.textContent = loadingText;
+  }
+  function hideSpinner(spinnerId, textId, defaultText) {
+    const spinner = document.getElementById(spinnerId);
+    const text = document.getElementById(textId);
+    if (spinner) spinner.hidden = true;
+    if (text) text.textContent = defaultText;
+  }
+
   /* ── Boot ── */
   document.addEventListener('DOMContentLoaded', () => {
     initReveal();
@@ -567,6 +665,7 @@
     initRegisterForm();
     initLoginForm();
     initForgotForm();
+    initPasswordHints();
     checkVerifiedParam();
   });
 })();
