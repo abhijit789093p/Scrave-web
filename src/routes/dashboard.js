@@ -24,7 +24,7 @@ router.get('/account', async (req, res) => {
   }
 
   const { rows: keys } = await pool.query(
-    'SELECT id, key_prefix, name, active, created_at FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC',
+    'SELECT id, key_prefix, key_value, name, active, created_at FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC',
     [user.id]
   );
 
@@ -48,7 +48,13 @@ router.get('/account', async (req, res) => {
 
   res.json({
     user: { id: user.id, name: user.name || '', email: user.email, tier: user.tier, createdAt: user.created_at },
-    keys: keys.map((k) => ({ id: k.id, prefix: k.key_prefix, name: k.name, active: !!k.active, createdAt: k.created_at })),
+    keys: keys.map((k) => {
+      let fullKey = null;
+      if (k.key_value) {
+        try { fullKey = apiKeyUtil.decrypt(k.key_value); } catch { /* decryption failed */ }
+      }
+      return { id: k.id, prefix: k.key_prefix, fullKey, name: k.name, active: !!k.active, createdAt: k.created_at };
+    }),
     usage,
     support,
   });
@@ -84,10 +90,11 @@ router.post('/regenerate-key', async (req, res) => {
   const rawKey = apiKeyUtil.generate();
   const keyHash = apiKeyUtil.hash(rawKey);
   const keyPrefix = apiKeyUtil.getPrefix(rawKey);
+  const keyEncrypted = apiKeyUtil.encrypt(rawKey);
 
   await pool.query(
-    'INSERT INTO api_keys (user_id, key_hash, key_prefix) VALUES ($1, $2, $3)',
-    [req.jwtUser.id, keyHash, keyPrefix]
+    'INSERT INTO api_keys (user_id, key_hash, key_prefix, key_value) VALUES ($1, $2, $3, $4)',
+    [req.jwtUser.id, keyHash, keyPrefix, keyEncrypted]
   );
 
   res.json({

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
     user_id INTEGER NOT NULL REFERENCES users(id),
     key_hash TEXT UNIQUE NOT NULL,
     key_prefix TEXT NOT NULL,
+    key_value TEXT,
     name TEXT DEFAULT 'default',
     active INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ DEFAULT NOW()

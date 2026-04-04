@@ -18,6 +18,7 @@ async function migrate() {
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMPTZ",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INTEGER NOT NULL DEFAULT 0",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ",
+    "ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS key_value TEXT",
   ];
 
   for (const sql of addColumns) {
