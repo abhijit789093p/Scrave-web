@@ -120,10 +120,10 @@
     document.getElementById('dash-key-value').style.color = 'var(--hue-teal)';
     document.getElementById('dash-key-status').hidden = false;
     document.getElementById('dash-key-status').textContent = 'Active';
-    document.getElementById('key-warn').hidden = false;
+    document.getElementById('key-warn').hidden = true;
     document.getElementById('key-copy-btn').style.visibility = 'visible';
     document.getElementById('gen-key-btn').textContent = 'Regenerate Key';
-    document.getElementById('key-description').textContent = 'Your key is masked below. Click copy to get the full key. Save it now!';
+    document.getElementById('key-description').textContent = 'Your key is masked below. Click copy to get the full key.';
   }
 
   function renderHistory(logs) {
